@@ -81,6 +81,7 @@ def load_model():
         traceback.print_exc()  # 詳細なエラー情報を出力
         return None
 
+
 def extract_assistant_response(outputs, user_prompt):
     """モデルの出力からアシスタントの応答を抽出する"""
     assistant_response = ""
@@ -140,10 +141,12 @@ async def startup_event():
     else:
         print("起動時にモデルの初期化が完了しました。")
 
+
 @app.get("/")
 async def root():
     """基本的なAPIチェック用のルートエンドポイント"""
     return {"status": "ok", "message": "Local LLM API is runnning"}
+
 
 @app.get("/health")
 async def health_check():
@@ -199,6 +202,7 @@ async def generate_simple(request: SimpleGenerationRequest):
         print(f"シンプル応答生成中にエラーが発生しました: {e}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=f"応答の生成中にエラーが発生しました: {str(e)}")
+
 
 def load_model_task():
     """モデルを読み込むバックグラウンドタスク"""

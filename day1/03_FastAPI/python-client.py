@@ -1,9 +1,9 @@
-# python_client.py
 # このコードは、ngrokで公開されたAPIにアクセスするPythonクライアントの例です
 
 import requests
 import json
 import time
+
 
 class LLMClient:
     """LLM API クライアントクラス"""
@@ -15,7 +15,7 @@ class LLMClient:
         Args:
             api_url (str): API のベース URL（ngrok URL）
         """
-        self.api_url = api_url.rstrip('/')
+        self.api_url = api_url.rstrip("/")
         self.session = requests.Session()
     
     def health_check(self):
@@ -84,4 +84,4 @@ if __name__ == "__main__":
     ])
     print(f"Response: {result['generated_text']}")
     print(f"Model processing time: {result['response_time']:.2f}s")
-    print(f"Total request time: {result['total_request_time']:.2f}s")    
+    print(f"Total request time: {result['total_request_time']:.2f}s")
