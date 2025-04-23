@@ -1,4 +1,3 @@
-# metrics.py
 import streamlit as st
 import nltk
 from janome.tokenizer import Tokenizer
@@ -8,7 +7,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 # NLTKのヘルパー関数（エラー時フォールバック付き）
 try:
-    nltk.download('punkt', quiet=True)
+    nltk.download("punkt", quiet=True)
     from nltk.translate.bleu_score import sentence_bleu as nltk_sentence_bleu
     from nltk.tokenize import word_tokenize as nltk_word_tokenize
     print("NLTK loaded successfully.") # デバッグ用
@@ -26,13 +25,15 @@ except Exception as e:
         f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
         return f1 # F1スコアを返す（簡易的な代替）
 
+
 def initialize_nltk():
     """NLTKのデータダウンロードを試みる関数"""
     try:
-        nltk.download('punkt', quiet=True)
+        nltk.download("punkt", quiet=True)
         print("NLTK Punkt data checked/downloaded.") # デバッグ用
     except Exception as e:
         st.error(f"NLTKデータのダウンロードに失敗しました: {e}")
+
 
 def calculate_metrics(answer, correct_answer):
     """回答と正解から評価指標を計算する"""
@@ -82,8 +83,8 @@ def calculate_metrics(answer, correct_answer):
 
         # 関連性スコア（キーワードの一致率などで簡易的に計算）
         try:
-            answer_words = set(re.findall(r'\w+', answer_lower))
-            correct_words = set(re.findall(r'\w+', correct_answer_lower))
+            answer_words = set(re.findall(r"\w+", answer_lower))
+            correct_words = set(re.findall(r"\w+", correct_answer_lower))
             if len(correct_words) > 0:
                 common_words = answer_words.intersection(correct_words)
                 relevance_score = len(common_words) / len(correct_words)
@@ -94,6 +95,7 @@ def calculate_metrics(answer, correct_answer):
             relevance_score = 0.0 # エラー時は0
 
     return bleu_score, similarity_score, word_count, relevance_score
+
 
 def get_metrics_descriptions():
     """評価指標の説明を返す"""

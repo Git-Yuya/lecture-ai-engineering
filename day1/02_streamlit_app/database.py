@@ -1,4 +1,3 @@
-# database.py
 import sqlite3
 import pandas as pd
 from datetime import datetime
@@ -8,7 +7,7 @@ from metrics import calculate_metrics # metricsを計算するために必要
 
 # --- スキーマ定義 ---
 TABLE_NAME = "chat_history"
-SCHEMA = f'''
+SCHEMA = f"""
 CREATE TABLE IF NOT EXISTS {TABLE_NAME}
 (id INTEGER PRIMARY KEY AUTOINCREMENT,
  timestamp TEXT,
@@ -22,7 +21,7 @@ CREATE TABLE IF NOT EXISTS {TABLE_NAME}
  similarity_score REAL,
  word_count INTEGER,
  relevance_score REAL)
-'''
+"""
 
 # --- データベース初期化 ---
 def init_db():
@@ -52,11 +51,11 @@ def save_to_db(question, answer, feedback, correct_answer, is_correct, response_
             answer, correct_answer
         )
 
-        c.execute(f'''
+        c.execute(f"""
         INSERT INTO {TABLE_NAME} (timestamp, question, answer, feedback, correct_answer, is_correct,
                                  response_time, bleu_score, similarity_score, word_count, relevance_score)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ''', (timestamp, question, answer, feedback, correct_answer, is_correct,
+        """, (timestamp, question, answer, feedback, correct_answer, is_correct,
              response_time, bleu_score, similarity_score, word_count, relevance_score))
         conn.commit()
         print("Data saved to DB successfully.") # デバッグ用
@@ -66,6 +65,7 @@ def save_to_db(question, answer, feedback, correct_answer, is_correct, response_
         if conn:
             conn.close()
 
+
 def get_chat_history():
     """データベースから全てのチャット履歴を取得する"""
     conn = None
@@ -74,8 +74,8 @@ def get_chat_history():
         # is_correctがREAL型なので、それに応じて読み込む
         df = pd.read_sql_query(f"SELECT * FROM {TABLE_NAME} ORDER BY timestamp DESC", conn)
         # is_correct カラムのデータ型を確認し、必要なら変換
-        if 'is_correct' in df.columns:
-             df['is_correct'] = pd.to_numeric(df['is_correct'], errors='coerce') # 数値に変換、失敗したらNaN
+        if "is_correct" in df.columns:
+             df["is_correct"] = pd.to_numeric(df["is_correct"], errors="coerce") # 数値に変換、失敗したらNaN
         return df
     except sqlite3.Error as e:
         st.error(f"履歴の取得中にエラーが発生しました: {e}")
@@ -83,6 +83,7 @@ def get_chat_history():
     finally:
         if conn:
             conn.close()
+
 
 def get_db_count():
     """データベース内のレコード数を取得する"""
@@ -99,6 +100,7 @@ def get_db_count():
     finally:
         if conn:
             conn.close()
+
 
 def clear_db():
     """データベースの全レコードを削除する"""

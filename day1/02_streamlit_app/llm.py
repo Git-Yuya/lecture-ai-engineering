@@ -1,4 +1,3 @@
-# llm.py
 import os
 import torch
 from transformers import pipeline
@@ -31,6 +30,7 @@ def load_model():
         st.error("GPUメモリ不足の可能性があります。不要なプロセスを終了するか、より小さいモデルの使用を検討してください。")
         return None
 
+
 def generate_response(pipe, user_question):
     """LLMを使用して質問に対する回答を生成する"""
     if pipe is None:
@@ -48,31 +48,30 @@ def generate_response(pipe, user_question):
         # 最後のassistantのメッセージを取得
         assistant_response = ""
         if outputs and isinstance(outputs, list) and outputs[0].get("generated_text"):
-           if isinstance(outputs[0]["generated_text"], list) and len(outputs[0]["generated_text"]) > 0:
-               # messages形式の場合
-               last_message = outputs[0]["generated_text"][-1]
-               if last_message.get("role") == "assistant":
-                   assistant_response = last_message.get("content", "").strip()
-           elif isinstance(outputs[0]["generated_text"], str):
-               # 単純な文字列の場合（古いtransformers？） - プロンプト部分を除く処理が必要かも
-               # この部分はモデルやtransformersのバージョンによって調整が必要
-               full_text = outputs[0]["generated_text"]
-               # 簡単な方法：ユーザーの質問以降の部分を取得
-               prompt_end = user_question
-               response_start_index = full_text.find(prompt_end) + len(prompt_end)
-               # 応答部分のみを抽出（より堅牢な方法が必要な場合あり）
-               possible_response = full_text[response_start_index:].strip()
-               # 特定の開始トークンを探すなど、モデルに合わせた調整
-               if "<start_of_turn>model" in possible_response:
-                    assistant_response = possible_response.split("<start_of_turn>model\n")[-1].strip()
-               else:
-                    assistant_response = possible_response # フォールバック
+            if isinstance(outputs[0]["generated_text"], list) and len(outputs[0]["generated_text"]) > 0:
+                # messages形式の場合
+                last_message = outputs[0]["generated_text"][-1]
+                if last_message.get("role") == "assistant":
+                    assistant_response = last_message.get("content", "").strip()
+            elif isinstance(outputs[0]["generated_text"], str):
+                # 単純な文字列の場合（古いtransformers？） - プロンプト部分を除く処理が必要かも
+                # この部分はモデルやtransformersのバージョンによって調整が必要
+                full_text = outputs[0]["generated_text"]
+                # 簡単な方法：ユーザーの質問以降の部分を取得
+                prompt_end = user_question
+                response_start_index = full_text.find(prompt_end) + len(prompt_end)
+                # 応答部分のみを抽出（より堅牢な方法が必要な場合あり）
+                possible_response = full_text[response_start_index:].strip()
+                # 特定の開始トークンを探すなど、モデルに合わせた調整
+                if "<start_of_turn>model" in possible_response:
+                        assistant_response = possible_response.split("<start_of_turn>model\n")[-1].strip()
+                else:
+                        assistant_response = possible_response # フォールバック
 
         if not assistant_response:
-             # 上記で見つからない場合のフォールバックやデバッグ
-             print("Warning: Could not extract assistant response. Full output:", outputs)
-             assistant_response = "回答の抽出に失敗しました。"
-
+            # 上記で見つからない場合のフォールバックやデバッグ
+            print("Warning: Could not extract assistant response. Full output:", outputs)
+            assistant_response = "回答の抽出に失敗しました。"
 
         end_time = time.time()
         response_time = end_time - start_time

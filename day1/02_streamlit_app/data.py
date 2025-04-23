@@ -1,4 +1,3 @@
-# data.py
 import streamlit as st
 from datetime import datetime
 from database import save_to_db, get_db_count # DB操作関数をインポート
@@ -46,7 +45,7 @@ SAMPLE_QUESTIONS_DATA = [
         "is_correct": 0.5,
         "response_time": 1.8
     },
-        {
+    {
         "question": "ディープラーニングとは何ですか？",
         "answer": "ディープラーニングは、複数の層からなるニューラルネットワークを用いた機械学習手法です。画像認識や自然言語処理など複雑なタスクに優れています。",
         "correct_answer": "ディープラーニングは多層ニューラルネットワークを使用した機械学習の一種で、特徴抽出を自動的に行う能力があります。画像認識、自然言語処理、音声認識などの複雑なタスクで革命的な成果を上げており、大量のデータと計算リソースを活用して従来の手法を超える性能を実現しています。",
@@ -113,6 +112,7 @@ def create_sample_evaluation_data():
     except Exception as e:
         st.error(f"サンプルデータの作成中にエラーが発生しました: {e}")
         print(f"エラー詳細: {e}") # コンソールにも出力
+
 
 def ensure_initial_data():
     """データベースが空の場合に初期サンプルデータを投入する"""

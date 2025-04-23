@@ -1,4 +1,3 @@
-# ui.py
 import streamlit as st
 import pandas as pd
 import time
@@ -49,12 +48,12 @@ def display_chat_page(pipe):
         else:
              # フィードバック送信済みの場合、次の質問を促すか、リセットする
              if st.button("次の質問へ"):
-                  # 状態をリセット
-                  st.session_state.current_question = ""
-                  st.session_state.current_answer = ""
-                  st.session_state.response_time = 0.0
-                  st.session_state.feedback_given = False
-                  st.rerun() # 画面をクリア
+                # 状態をリセット
+                st.session_state.current_question = ""
+                st.session_state.current_answer = ""
+                st.session_state.response_time = 0.0
+                st.session_state.feedback_given = False
+                st.rerun() # 画面をクリア
 
 
 def display_feedback_form():
@@ -108,6 +107,7 @@ def display_history_page():
     with tab2:
         display_metrics_analysis(history_df)
 
+
 def display_history_list(history_df):
     """履歴リストを表示する"""
     st.write("#### 履歴リスト")
@@ -140,12 +140,11 @@ def display_history_list(history_df):
     items_per_page = 5
     total_items = len(filtered_df)
     total_pages = (total_items + items_per_page - 1) // items_per_page
-    current_page = st.number_input('ページ', min_value=1, max_value=total_pages, value=1, step=1)
+    current_page = st.number_input("ページ", min_value=1, max_value=total_pages, value=1, step=1)
 
     start_idx = (current_page - 1) * items_per_page
     end_idx = start_idx + items_per_page
     paginated_df = filtered_df.iloc[start_idx:end_idx]
-
 
     for i, row in paginated_df.iterrows():
         with st.expander(f"{row['timestamp']} - Q: {row['question'][:50] if row['question'] else 'N/A'}..."):
@@ -164,9 +163,9 @@ def display_history_list(history_df):
 
             cols = st.columns(3)
             # NaNの場合はハイフン表示
-            cols[0].metric("BLEU", f"{row['bleu_score']:.4f}" if pd.notna(row['bleu_score']) else "-")
-            cols[1].metric("類似度", f"{row['similarity_score']:.4f}" if pd.notna(row['similarity_score']) else "-")
-            cols[2].metric("関連性", f"{row['relevance_score']:.4f}" if pd.notna(row['relevance_score']) else "-")
+            cols[0].metric("BLEU", f"{row['bleu_score']:.4f}" if pd.notna(row["bleu_score"]) else "-")
+            cols[1].metric("類似度", f"{row['similarity_score']:.4f}" if pd.notna(row["similarity_score"]) else "-")
+            cols[2].metric("関連性", f"{row['relevance_score']:.4f}" if pd.notna(row["relevance_score"]) else "-")
 
     st.caption(f"{total_items} 件中 {start_idx+1} - {min(end_idx, total_items)} 件を表示")
 
@@ -176,17 +175,17 @@ def display_metrics_analysis(history_df):
     st.write("#### 評価指標の分析")
 
     # is_correct が NaN のレコードを除外して分析
-    analysis_df = history_df.dropna(subset=['is_correct'])
+    analysis_df = history_df.dropna(subset=["is_correct"])
     if analysis_df.empty:
         st.warning("分析可能な評価データがありません。")
         return
 
-    accuracy_labels = {1.0: '正確', 0.5: '部分的に正確', 0.0: '不正確'}
-    analysis_df['正確性'] = analysis_df['is_correct'].map(accuracy_labels)
+    accuracy_labels = {1.0: "正確", 0.5: "部分的に正確", 0.0: "不正確"}
+    analysis_df["正確性"] = analysis_df["is_correct"].map(accuracy_labels)
 
     # 正確性の分布
     st.write("##### 正確性の分布")
-    accuracy_counts = analysis_df['正確性'].value_counts()
+    accuracy_counts = analysis_df["正確性"].value_counts()
     if not accuracy_counts.empty:
         st.bar_chart(accuracy_counts)
     else:
@@ -205,13 +204,13 @@ def display_metrics_analysis(history_df):
             key="metric_select"
         )
 
-        chart_data = analysis_df[['response_time', metric_option, '正確性']].dropna() # NaNを除外
+        chart_data = analysis_df[["response_time", metric_option, "正確性"]].dropna() # NaNを除外
         if not chart_data.empty:
-             st.scatter_chart(
+            st.scatter_chart(
                 chart_data,
-                x='response_time',
+                x="response_time",
                 y=metric_option,
-                color='正確性',
+                color="正確性",
             )
         else:
             st.info(f"選択された指標 ({metric_option}) と応答時間の有効なデータがありません。")
@@ -219,10 +218,9 @@ def display_metrics_analysis(history_df):
     else:
         st.info("応答時間と比較できる指標データがありません。")
 
-
     # 全体の評価指標の統計
     st.write("##### 評価指標の統計")
-    stats_cols = ['response_time', 'bleu_score', 'similarity_score', 'word_count', 'relevance_score']
+    stats_cols = ["response_time", "bleu_score", "similarity_score", "word_count", "relevance_score"]
     valid_stats_cols = [c for c in stats_cols if c in analysis_df.columns and analysis_df[c].notna().any()]
     if valid_stats_cols:
         metrics_stats = analysis_df[valid_stats_cols].describe()
@@ -232,37 +230,35 @@ def display_metrics_analysis(history_df):
 
     # 正確性レベル別の平均スコア
     st.write("##### 正確性レベル別の平均スコア")
-    if valid_stats_cols and '正確性' in analysis_df.columns:
+    if valid_stats_cols and "正確性" in analysis_df.columns:
         try:
-            accuracy_groups = analysis_df.groupby('正確性')[valid_stats_cols].mean()
+            accuracy_groups = analysis_df.groupby("正確性")[valid_stats_cols].mean()
             st.dataframe(accuracy_groups)
         except Exception as e:
             st.warning(f"正確性別スコアの集計中にエラーが発生しました: {e}")
     else:
-         st.info("正確性レベル別の平均スコアを計算できるデータがありません。")
-
+        st.info("正確性レベル別の平均スコアを計算できるデータがありません。")
 
     # カスタム評価指標：効率性スコア
     st.write("##### 効率性スコア (正確性 / (応答時間 + 0.1))")
-    if 'response_time' in analysis_df.columns and analysis_df['response_time'].notna().any():
+    if "response_time" in analysis_df.columns and analysis_df["response_time"].notna().any():
         # ゼロ除算を避けるために0.1を追加
-        analysis_df['efficiency_score'] = analysis_df['is_correct'] / (analysis_df['response_time'].fillna(0) + 0.1)
+        analysis_df["efficiency_score"] = analysis_df["is_correct"] / (analysis_df["response_time"].fillna(0) + 0.1)
         # IDカラムが存在するか確認
-        if 'id' in analysis_df.columns:
+        if "id" in analysis_df.columns:
             # 上位10件を表示
-            top_efficiency = analysis_df.sort_values('efficiency_score', ascending=False).head(10)
+            top_efficiency = analysis_df.sort_values("efficiency_score", ascending=False).head(10)
             # id をインデックスにする前に存在確認
             if not top_efficiency.empty:
-                st.bar_chart(top_efficiency.set_index('id')['efficiency_score'])
+                st.bar_chart(top_efficiency.set_index("id")["efficiency_score"])
             else:
                 st.info("効率性スコアデータがありません。")
         else:
             # IDがない場合は単純にスコアを表示
-             st.bar_chart(analysis_df.sort_values('efficiency_score', ascending=False).head(10)['efficiency_score'])
+             st.bar_chart(analysis_df.sort_values("efficiency_score", ascending=False).head(10)["efficiency_score"])
 
     else:
         st.info("効率性スコアを計算するための応答時間データがありません。")
-
 
 # --- サンプルデータ管理ページのUI ---
 def display_data_page():

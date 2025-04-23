@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import ui                   # UIモジュール
 import llm                  # LLMモジュール
@@ -53,7 +52,7 @@ st.markdown("---")
 # --- サイドバー ---
 st.sidebar.title("ナビゲーション")
 # セッション状態を使用して選択ページを保持
-if 'page' not in st.session_state:
+if "page" not in st.session_state:
     st.session_state.page = "チャット" # デフォルトページ
 
 page = st.sidebar.radio(
@@ -61,7 +60,7 @@ page = st.sidebar.radio(
     ["チャット", "履歴閲覧", "サンプルデータ管理"],
     key="page_selector",
     index=["チャット", "履歴閲覧", "サンプルデータ管理"].index(st.session_state.page), # 現在のページを選択状態にする
-    on_change=lambda: setattr(st.session_state, 'page', st.session_state.page_selector) # 選択変更時に状態を更新
+    on_change=lambda: setattr(st.session_state, "page", st.session_state.page_selector) # 選択変更時に状態を更新
 )
 
 
@@ -78,4 +77,4 @@ elif st.session_state.page == "サンプルデータ管理":
 
 # --- フッターなど（任意） ---
 st.sidebar.markdown("---")
-st.sidebar.info("開発者: [Your Name]")
+st.sidebar.info("開発者: Git-Yuya")
