@@ -1,13 +1,16 @@
 import streamlit as st
-import ui                   # UIモジュール
-import llm                  # LLMモジュール
-import database             # データベースモジュール
-import metrics              # 評価指標モジュール
-import data                 # データモジュール
 import torch
-from transformers import pipeline
+
 from config import MODEL_NAME
 from huggingface_hub import HfFolder
+from transformers import pipeline
+
+import data                # データモジュール
+import database            # データベースモジュール
+import llm                 # LLMモジュール
+import metrics             # 評価指標モジュール
+import ui                  # UIモジュール
+
 
 # --- アプリケーション設定 ---
 st.set_page_config(page_title="Gemma Chatbot", layout="wide")

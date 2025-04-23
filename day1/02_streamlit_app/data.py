@@ -1,6 +1,6 @@
 import streamlit as st
-from datetime import datetime
-from database import save_to_db, get_db_count # DB操作関数をインポート
+
+from database import get_db_count, save_to_db  # DB操作関数をインポート
 
 # サンプルデータのリスト
 SAMPLE_QUESTIONS_DATA = [

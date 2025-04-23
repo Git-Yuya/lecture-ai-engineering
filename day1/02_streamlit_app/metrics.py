@@ -1,9 +1,11 @@
-import streamlit as st
-import nltk
-from janome.tokenizer import Tokenizer
 import re
-from sklearn.metrics.pairwise import cosine_similarity
+
+import nltk
+import streamlit as st
+from janome.tokenizer import Tokenizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
 
 # NLTKのヘルパー関数（エラー時フォールバック付き）
 try:

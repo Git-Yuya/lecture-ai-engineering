@@ -1,8 +1,9 @@
 # このコードは、ngrokで公開されたAPIにアクセスするPythonクライアントの例です
 
-import requests
 import json
 import time
+
+import requests
 
 
 class LLMClient:

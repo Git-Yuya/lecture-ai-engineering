@@ -1,10 +1,11 @@
-import streamlit as st
 import pandas as pd
-import time
-from database import save_to_db, get_chat_history, get_db_count, clear_db
-from llm import generate_response
+import streamlit as st
+
 from data import create_sample_evaluation_data
+from database import clear_db, get_chat_history, get_db_count, save_to_db
+from llm import generate_response
 from metrics import get_metrics_descriptions
+
 
 # --- チャットページのUI ---
 def display_chat_page(pipe):

@@ -1,7 +1,9 @@
-import streamlit as st
-import pandas as pd
-import numpy as np
 import time
+
+import numpy as np
+import pandas as pd
+import streamlit as st
+
 
 # ============================================
 # ページ設定

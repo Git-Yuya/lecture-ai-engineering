@@ -1,9 +1,11 @@
 import sqlite3
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
 import streamlit as st
+
 from config import DB_FILE
-from metrics import calculate_metrics # metricsを計算するために必要
+from metrics import calculate_metrics  # metricsを計算するために必要
 
 # --- スキーマ定義 ---
 TABLE_NAME = "chat_history"

@@ -1,15 +1,17 @@
 import os
-import torch
-from transformers import pipeline
 import time
 import traceback
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
-import uvicorn
+from typing import Optional
+
 import nest_asyncio
+import torch
+import uvicorn
+from fastapi import BackgroundTasks, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pyngrok import ngrok
+from pydantic import BaseModel
+from transformers import pipeline
+
 
 # --- 設定 ---
 # モデル名を設定
