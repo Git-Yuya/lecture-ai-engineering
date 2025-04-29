@@ -10,27 +10,29 @@ from metrics import get_metrics_descriptions
 # --- チャットページのUI ---
 def display_chat_page(pipe):
     """チャットページのUIを表示する"""
-    st.subheader("質問を入力してください")
-    user_question = st.text_area("質問", key="question_input", height=100, value=st.session_state.get("current_question", ""))
-    submit_button = st.button("質問を送信")
+    with st.container():
+        st.subheader("質問を入力してください", divider="rainbow")
+        with st.form(key="question_form"):
+            user_question = st.text_area("質問", key="question_input", height=100, value=st.session_state.get("current_question", ""))
+            submit_button = st.form_submit_button("🚀質問を送信")
 
     # セッション状態の初期化（安全のため）
-    if "current_question" not in st.session_state:
-        st.session_state.current_question = ""
-    if "current_answer" not in st.session_state:
-        st.session_state.current_answer = ""
-    if "response_time" not in st.session_state:
-        st.session_state.response_time = 0.0
-    if "feedback_given" not in st.session_state:
-        st.session_state.feedback_given = False
+    for key, default_value in {
+        "current_question": "",
+        "current_answer": "",
+        "response_time": 0.0,
+        "feedback_given": False,
+    }.items():
+        if key not in st.session_state:
+            st.session_state[key] = default_value
 
     # 質問が送信された場合
     if submit_button and user_question:
         st.session_state.current_question = user_question
-        st.session_state.current_answer = "" # 回答をリセット
-        st.session_state.feedback_given = False # フィードバック状態もリセット
+        st.session_state.current_answer = ""  # 回答をリセット
+        st.session_state.feedback_given = False  # フィードバック状態もリセット
 
-        with st.spinner("モデルが回答を生成中..."):
+        with st.spinner("🧠モデルが回答を生成中..."):
             answer, response_time = generate_response(pipe, user_question)
             st.session_state.current_answer = answer
             st.session_state.response_time = response_time
@@ -39,38 +41,45 @@ def display_chat_page(pipe):
 
     # 回答が表示されるべきか判断 (質問があり、回答が生成済みで、まだフィードバックされていない)
     if st.session_state.current_question and st.session_state.current_answer:
-        st.subheader("回答:")
-        st.markdown(st.session_state.current_answer) # Markdownで表示
-        st.info(f"応答時間: {st.session_state.response_time:.2f}秒")
+        st.subheader("📋回答:", divider="rainbow")
+        st.markdown(st.session_state.current_answer)  # Markdownで表示
+        st.info(f"⏱️応答時間: {st.session_state.response_time:.2f}秒")
 
         # フィードバックフォームを表示 (まだフィードバックされていない場合)
         if not st.session_state.feedback_given:
             display_feedback_form()
         else:
              # フィードバック送信済みの場合、次の質問を促すか、リセットする
-             if st.button("次の質問へ"):
+             if st.button("🔄次の質問へ"):
                 # 状態をリセット
                 st.session_state.current_question = ""
                 st.session_state.current_answer = ""
                 st.session_state.response_time = 0.0
                 st.session_state.feedback_given = False
-                st.rerun() # 画面をクリア
+                st.rerun()  # 画面をクリア
 
 
 def display_feedback_form():
     """フィードバック入力フォームを表示する"""
     with st.form("feedback_form"):
-        st.subheader("フィードバック")
+        st.subheader("📝フィードバック", divider="rainbow")
         feedback_options = ["正確", "部分的に正確", "不正確"]
-        # label_visibility='collapsed' でラベルを隠す
-        feedback = st.radio("回答の評価", feedback_options, key="feedback_radio", label_visibility='collapsed', horizontal=True)
+        # label_visibility="collapsed" でラベルを隠す
+        feedback = st.radio(
+            "回答の評価",
+            feedback_options,
+            key="feedback_radio",
+            label_visibility="collapsed",
+            horizontal=True
+        )
         correct_answer = st.text_area("より正確な回答（任意）", key="correct_answer_input", height=100)
         feedback_comment = st.text_area("コメント（任意）", key="feedback_comment_input", height=100)
-        submitted = st.form_submit_button("フィードバックを送信")
+        
+        submitted = st.form_submit_button("✅フィードバックを送信")
         if submitted:
             # フィードバックをデータベースに保存
             is_correct = 1.0 if feedback == "正確" else (0.5 if feedback == "部分的に正確" else 0.0)
-            # コメントがない場合でも '正確' などの評価はfeedbackに含まれるようにする
+            # コメントがない場合でも "正確" などの評価はfeedbackに含まれるようにする
             combined_feedback = f"{feedback}"
             if feedback_comment:
                 combined_feedback += f": {feedback_comment}"
@@ -87,24 +96,22 @@ def display_feedback_form():
             st.success("フィードバックが保存されました！")
             # フォーム送信後に状態をリセットしない方が、ユーザーは結果を確認しやすいかも
             # 必要ならここでリセットして st.rerun()
-            st.rerun() # フィードバックフォームを消すために再実行
+            st.rerun()  # フィードバックフォームを消すために再実行
 
 # --- 履歴閲覧ページのUI ---
 def display_history_page():
     """履歴閲覧ページのUIを表示する"""
-    st.subheader("チャット履歴と評価指標")
+    st.subheader("チャット履歴と評価指標", divider="rainbow")
+    
     history_df = get_chat_history()
-
     if history_df.empty:
         st.info("まだチャット履歴がありません。")
         return
 
     # タブでセクションを分ける
-    tab1, tab2 = st.tabs(["履歴閲覧", "評価指標分析"])
-
+    tab1, tab2 = st.tabs(["📚履歴閲覧", "📊評価指標分析"])
     with tab1:
         display_history_list(history_df)
-
     with tab2:
         display_metrics_analysis(history_df)
 
@@ -123,7 +130,7 @@ def display_history_list(history_df):
         "表示フィルタ",
         options=filter_options.keys(),
         horizontal=True,
-        label_visibility="collapsed" # ラベル非表示
+        label_visibility="collapsed"  # ラベル非表示
     )
 
     filter_value = filter_options[display_option]
@@ -152,7 +159,7 @@ def display_history_list(history_df):
             st.markdown(f"**Q:** {row['question']}")
             st.markdown(f"**A:** {row['answer']}")
             st.markdown(f"**Feedback:** {row['feedback']}")
-            if row['correct_answer']:
+            if row["correct_answer"]:
                 st.markdown(f"**Correct A:** {row['correct_answer']}")
 
             # 評価指標の表示
@@ -205,7 +212,7 @@ def display_metrics_analysis(history_df):
             key="metric_select"
         )
 
-        chart_data = analysis_df[["response_time", metric_option, "正確性"]].dropna() # NaNを除外
+        chart_data = analysis_df[["response_time", metric_option, "正確性"]].dropna()  # NaNを除外
         if not chart_data.empty:
             st.scatter_chart(
                 chart_data,
@@ -264,24 +271,24 @@ def display_metrics_analysis(history_df):
 # --- サンプルデータ管理ページのUI ---
 def display_data_page():
     """サンプルデータ管理ページのUIを表示する"""
-    st.subheader("サンプル評価データの管理")
+    st.subheader("🛠️サンプル評価データの管理", divider="rainbow")
     count = get_db_count()
     st.write(f"現在のデータベースには {count} 件のレコードがあります。")
 
     col1, col2 = st.columns(2)
     with col1:
-        if st.button("サンプルデータを追加", key="create_samples"):
+        if st.button("📥サンプルデータを追加", key="create_samples"):
             create_sample_evaluation_data()
-            st.rerun() # 件数表示を更新
+            st.rerun()  # 件数表示を更新
 
     with col2:
         # 確認ステップ付きのクリアボタン
-        if st.button("データベースをクリア", key="clear_db_button"):
-            if clear_db(): # clear_db内で確認と実行を行う
-                st.rerun() # クリア後に件数表示を更新
+        if st.button("🗑️データベースをクリア", key="clear_db_button"):
+            if clear_db():  # clear_db内で確認と実行を行う
+                st.rerun()  # クリア後に件数表示を更新
 
     # 評価指標に関する解説
-    st.subheader("評価指標の説明")
+    st.subheader("📖評価指標の説明", divider="rainbow")
     metrics_info = get_metrics_descriptions()
     for metric, description in metrics_info.items():
         with st.expander(f"{metric}"):
