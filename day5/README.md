@@ -1,6 +1,6 @@
 # day5 演習用ディレクトリ
 
-第3回「MLOps」に関する演習用のディレクトリです。
+第5回「MLOps」に関する演習用のディレクトリです。
 
 # 演習の目的
 
@@ -51,6 +51,10 @@ GitHubを「Google Colab」上で使用できるようにするのに加え、da
 演習3は、リポジトリ直下の「.github」フォルダと、day5フォルダ直下の「演習3」フォルダを使用します。
 
 演習に必要なライブラリは、day5フォルダ直下の「requirements.txt」ファイルに記載しています。各自の演習環境にインストールしてください。
+```bash
+python3 -m venv .venv
+pip install -r requirements.txt
+```
 
 ## 演習1: 機械学習モデルの実験管理とパイプライン
 
@@ -110,7 +114,7 @@ cd 演習2
 python main.py
 pytest main.py
 
-black main.py
+black black_check.py
 ```
 
 ## 演習3: CI(継続的インテクレーション)
