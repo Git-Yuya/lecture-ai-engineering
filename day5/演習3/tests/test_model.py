@@ -1,16 +1,17 @@
 import os
-import pytest
-import pandas as pd
-import numpy as np
 import pickle
 import time
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score
-from sklearn.impute import SimpleImputer
-from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+import numpy as np
+import pandas as pd
+import pytest
 from sklearn.compose import ColumnTransformer
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.impute import SimpleImputer
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 # テスト用データとモデルパスを定義
 DATA_PATH = os.path.join(os.path.dirname(__file__), "../data/Titanic.csv")
@@ -18,7 +19,7 @@ MODEL_DIR = os.path.join(os.path.dirname(__file__), "../models")
 MODEL_PATH = os.path.join(MODEL_DIR, "titanic_model.pkl")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sample_data():
     """テスト用データセットを読み込む"""
     if not os.path.exists(DATA_PATH):
@@ -39,7 +40,7 @@ def sample_data():
     return pd.read_csv(DATA_PATH)
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def preprocessor():
     """前処理パイプラインを定義"""
     # 数値カラムと文字列カラムを定義
@@ -73,7 +74,7 @@ def preprocessor():
     return preprocessor
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def train_model(sample_data, preprocessor):
     """モデルの学習とテストデータの準備"""
     # データの分割とラベル変換
@@ -107,6 +108,14 @@ def test_model_exists():
     if not os.path.exists(MODEL_PATH):
         pytest.skip("モデルファイルが存在しないためスキップします")
     assert os.path.exists(MODEL_PATH), "モデルファイルが存在しません"
+
+
+def test_model_input_output_shape(train_model):
+    """モデルの入出力サイズを確認"""
+    model, X_test, y_test = train_model
+
+    y_pred = model.predict(X_test)
+    assert y_pred.shape == (len(X_test),), f"予測結果のサイズが不正: {y_pred.shape}"
 
 
 def test_model_accuracy(train_model):
