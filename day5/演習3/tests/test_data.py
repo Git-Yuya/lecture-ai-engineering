@@ -1,10 +1,9 @@
 import os
-import pytest
-import pandas as pd
-import numpy as np
-import great_expectations as gx
-from sklearn.datasets import fetch_openml
 import warnings
+
+import pandas as pd
+import pytest
+import great_expectations as gx
 
 # 警告を抑制
 warnings.filterwarnings("ignore")
@@ -13,7 +12,7 @@ warnings.filterwarnings("ignore")
 DATA_PATH = os.path.join(os.path.dirname(__file__), "../data/Titanic.csv")
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def sample_data():
     """Titanicテスト用データセットを読み込む"""
     return pd.read_csv(DATA_PATH)
@@ -37,10 +36,17 @@ def test_data_columns(sample_data):
         "Embarked",
         "Survived",
     ]
-    for col in expected_columns:
-        assert (
-            col in sample_data.columns
-        ), f"カラム '{col}' がデータセットに存在しません"
+
+    missing_columns = [
+        col for col in expected_columns if col not in sample_data.columns
+    ]
+    assert not missing_columns, f"カラム {missing_columns} がデータセットに存在しません"
+
+
+def test_no_duplicates(sample_data):
+    """完全重複行がないか検証"""
+    dup_count = sample_data.duplicated().sum()
+    assert dup_count == 0, f"完全重複したレコードが {dup_count} 件存在します"
 
 
 def test_data_types(sample_data):
